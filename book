@@ -1,0 +1,250 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Test_answer_1
+{
+    // creating class library with all the variables declared
+    public class Book_Library
+    {
+        public int bookId { get; set; }
+        public String bookName { get; set; }
+        public int ISBNno { get; set; }
+        public double bookPrice { get; set; }
+        public String bookPublisher { get; set; }
+        public int numberOfPages { get; set; }
+        public String bookLanguage { get; set; }
+        public String bookLoT { get; set; }
+        public String bookSummary { get; set; }
+       // Creating a collection dictionary to hold the entered data.
+        public Dictionary<int, ArrayList> books = new Dictionary<int, ArrayList>();
+    }
+    // Creating the class book that inherits data from Library
+   public class Books : Book_Library
+    {
+     // Empty Constructor
+        public Books()
+        {
+
+        }
+        // Constructor to assign values to the variables 
+        public Books(int id, String name, int isbn, double price, String publisher, int noofpages, String lang, String lot, String summary)
+        {
+            bookId = id;
+            bookName = name;
+            ISBNno = isbn;
+            bookPrice = price;
+            bookPublisher = publisher;
+            numberOfPages = noofpages;
+            bookLanguage = lang;
+            bookLoT = lot;
+            bookSummary = summary;
+        }
+        // Creating a method fuction to add data.
+        public void AddBooks()
+        {
+		  ValidateLibraryInformation validate = new ValidateLibraryInformation();
+            Console.WriteLine("Enter the number of books u want to enter");
+            int n = Convert.ToInt32(Console.ReadLine());
+            for (int i = 0; i < n; i++)
+            {
+                
+				 EnterId:
+            {
+                Console.Write("Enter Your Book ID:");
+                try
+                {
+                    bookId = validate.checkId(Console.ReadLine());
+                }
+                catch (MyException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    goto EnterId;
+                }
+            }
+               
+                Console.WriteLine("Enter the book's ISBNno");
+                ISBNno = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Enter number of pages");
+                numberOfPages = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Enter the price of the book");
+                bookPrice = Convert.ToDouble(Console.ReadLine());
+				EnterName:
+            {
+                Console.Write("Enter Your Book Name :");
+                try
+                {
+                   bookName= validate.checkName(Console.ReadLine());
+                }
+                catch (MyException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    goto EnterName;
+                }
+            }
+                
+                Console.WriteLine("Enter the publisher name");
+                bookPublisher = Console.ReadLine();
+                Console.WriteLine("Enter the language used in the book");
+                bookLanguage = Console.ReadLine();
+                if (bookLanguage == "")
+                {
+                    bookLanguage = "English";
+                }
+				LoT:
+            {
+                Console.Write("Enter the LoT:  ");
+                try
+                {
+                    bookLoT=validate.checkLoT(Console.ReadLine());
+                }
+                catch (MyException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    goto LoT;
+                }
+            }
+               
+                if (bookLoT == "")
+                {
+                    bookLoT = "Technical";
+                }
+                Console.WriteLine("Enter the book summary");
+                bookSummary = Console.ReadLine();
+                ArrayList bookList = new ArrayList();
+                bookList.Add(bookName);
+                bookList.Add(ISBNno);
+                bookList.Add(bookPrice);
+                bookList.Add(bookPublisher);
+                bookList.Add(numberOfPages);
+                bookList.Add(bookLanguage);
+                bookList.Add(bookLoT);
+                bookList.Add(bookSummary);
+                books.Add(bookId, bookList);
+            }
+
+        }
+        // Creating a Method function to display the required data.
+        public void DisplayBooks()
+        {
+            Console.WriteLine("enter the books'Id you want to view");
+            int id = Convert.ToInt32(Console.ReadLine());
+            foreach (var ele in books)
+            {
+                if (ele.Key == id)
+                {
+                    Console.WriteLine(ele.Key);
+                    foreach (var item in ele.Value)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
+            }
+			Console.WriteLine("Book ID not Exist");
+        }
+        // Creating a Method Function to delete the selected data
+        public void DeleteBooks()
+        {
+            Console.WriteLine("enter the books'Id you want to delete");
+            int delid = Convert.ToInt32(Console.ReadLine());
+			
+            foreach (var ele in books)
+            {
+                if (ele.Key == delid)
+                {
+                    books.Remove(delid);
+				    Console.WriteLine("Book Deleted Successfully");
+                }  
+            }
+            Console.WriteLine("Book ID not Exist");
+        }
+    }
+ public   class main
+    {
+      public  static void Main(string[] args)
+        {
+		    //Creating menu for user choice
+		    Console.WriteLine("1. Add");
+			Console.WriteLine("2. Delete");
+			Console.WriteLine("3. View");
+            Console.WriteLine("Enter the action you want to do ADD, DELETE or VIEW ");
+            String action = Console.ReadLine();
+            action = action.ToLower();
+            Books obj1 = new Books();
+            if (action=="add")
+            {
+                obj1.AddBooks();
+            }
+            else if (action == "view")
+            {
+                obj1.DisplayBooks();
+            }
+            else if (action == "delete")
+            {
+                obj1.DeleteBooks();
+            }
+            else
+            {
+                Console.WriteLine("Action not available");            // Printing Message choice not from menu
+            }
+            Console.ReadLine();
+        }
+	
+    }
+	 public   class MyException:Exception    //Exception class for Exception Handling
+    {
+        public MyException(String msg) : base(msg) { }
+    }
+   public class ValidateLibraryInformation
+    {
+        public int checkId(String bookId)
+        {
+            int result;
+            int.TryParse(bookId, out result);
+			if( String.IsNullOrEmpty(bookId))
+			throw new MyException("Book ID cannot be blank");
+            if (result > 0)
+            {
+				 // Throwing Exception for Book ID it cannot be empty and 5 digit only
+                if (bookId.Length != 5)
+                {
+                    throw new MyException("Not a 5 digit book id ");
+                }
+            }
+            else
+            {
+                throw new MyException(" BookID Id can contains only Digits...");
+            }
+            return Convert.ToInt32(bookId);
+        }
+        public string checkName(String bookName)
+        {
+			 // Throwing Exception for book name cannot be blank
+           string temp =bookName.ToLower();
+		if( String.IsNullOrEmpty(bookName))
+			throw new MyException("Book name cannot be blank");
+            foreach (var item in bookName)
+            {
+				 // Throwing Exception for Book name should be in alphabets
+                if (char.IsLetter(item))
+                {
+                    continue;
+                }
+                else
+                {
+                    throw new MyException("Enter only Alphabets  ");
+                }
+
+            }
+            return bookName;
+        }
+        public string checkLoT(String bookLoT)
+        {    // Throwing Exception for LOT
+            if (bookLoT.ToLower() == "“.net" || bookLoT.ToLower() == "java"|| bookLoT.ToLower() == "java"|| bookLoT.ToLower() == "ims"|| bookLoT.ToLower() == "v&v"|| bookLoT.ToLower() == "bi"|| bookLoT.ToLower() == "rdbms")
+            {
+                return bookLoT;
+            }
+            else {
+                throw new MyException("LoT  can contain only “.NET”, “Java”, “IMS”, “V&V”, “BI”, “RDBMS”");
+            }
+		}}}
